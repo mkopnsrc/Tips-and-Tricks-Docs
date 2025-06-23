@@ -1,0 +1,82 @@
+To get started on this project, here are few things you need before you can go head and configure on Proxmox side.
+
+# Requirements:
+
+-   **Storj.io Account** ( Signup for Free Account at [https://storj.io/](https://storj.io/) )
+    -   **Note 1**: Ensure to create an account based on your local region
+    -   **Note 2:** Can be upgraded to Pro Account later for higher storage limit
+    -   **Project** (More info on how to created, follow storj.io docs - [https://docs.storj.io/support/projects](https://docs.storj.io/support/projects)
+        -   **Bucket**
+        -   **S3 Credentials** - Make sure you allow full access to above bucket, and save the credentials for later use.
+-   goofys - From git repo [https://github.com/kahing/goofys](https://github.com/kahing/goofys) (we will be downloading this tool in below steps, skip this step)
+-   **Proxmox VE server with SSH**
+
+# Getting Started
+
+Assuming you've all the required steps completed from above, you can proceed with following steps:
+
+Login into Proxmox PVE dashboard and launch Shell or by SSH into Proxmox server where you want to mount Storj.io Bucket.
+
+## Installing Packages
+
+```plaintext
+apt update
+apt install fuse wget
+wget https://github.com/kahing/goofys/releases/latest/download/goofys
+mv goofys /usr/bin/goofys
+```
+
+## Goofys Permissions
+
+`chmod +x /usr/bin/goofys`
+
+## Configure S3 credentials
+
+-   Create .aws directory under root home directory  
+    `mkdir /root/.aws`
+-   Create a “credentials” file under /root/.aws/   
+    `touch /root/.aws/credentials`
+-   Edit credentials file and copy and paste below content, then update <ACCESS KEY> and <SECRET KEY> with yours that you've generated in requirements steps.
+
+```plaintext
+[storj]
+aws_access_key_id=<ACCESS KEY>
+aws_secret_access_key=<SECRET KEY>
+```
+
+## Preparing for mount
+
+-   Create directory where we will mount our bucket   
+    `mkdir /mnt/storj`
+-   Add our S3 bucket to system fstab file, Make sure to add it end of the file.  
+    `nano /etc/fstab`  
+    (replace “pve-backup-test” with your bucket name)
+
+```plaintext
+# Storj bucket S3 mount
+goofys#pve-backup-test /mnt/storj fuse _netdev,allow_other,--stat-cache-ttl=1s,--type-cache-ttl=1s,--endpoint=https://gateway.storjshare.io,--profile=storj 0 0
+```
+
+-   Now let's try to mount all fstab entries - `mount -a`, now go to our directory `cd /mnt/storj` and try to create a file `touch test`.
+
+## Upload Confirmation
+
+-   Now to confirm if the test file is successfully uploaded, go to Storj.io website and login then select your project and select the bucket name.
+
+![Bucket - objects view](https://motyka.pro/uploads/Screenshot%202023-02-06%20at%2022.14.58.png)
+
+## Proxmox Storage Configuration
+
+-   Now in Proxmox dashboard open Datacenter -> Storage -> Add -> Directory and fill the fields.
+
+![Screenshoot](https://motyka.pro/uploads/Screenshot%202023-02-06%20at%2022.17.00.png)
+
+-   Go to Datacenter -> Backup and set up a backup cron, you can run it by pressing “Run now” button above task list.
+
+![Screenshoot](https://motyka.pro/uploads/Screenshot%202023-02-06%20at%2022.19.24.png)
+
+## Backup Confirmation
+
+-   You can verify that files have been uploaded on Storj.io Bucket
+
+![Screenshoot](https://motyka.pro/uploads/Screenshot%202023-02-06%20at%2022.22.10.png)
