@@ -1,0 +1,35 @@
+# Jekyll Configuration for Tips and Tricks Documentation
+
+# Site Settings
+title: Tips and Tricks Documentation
+description: A comprehensive collection of technical documentation, guides, and how-tos for various technologies and systems
+baseurl: "/Tips-and-Tricks-Docs"
+url: "https://mkopnsrc.github.io"
+
+# Theme
+theme: minima
+
+# Build Settings
+markdown: kramdown
+highlighter: rouge
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# Exclude from processing
+exclude:
+  - .git
+  - .github
+  - README.md.bak
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+
+# Collections
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "default"
