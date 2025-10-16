@@ -1,3 +1,7 @@
+# Storj Bucket Mount using Goofys
+
+Mount Storj.io S3-compatible buckets on Proxmox using goofys for backup storage.
+
 To get started on this project, here are few things you need before you can go head and configure on Proxmox side.
 
 # Requirements:
